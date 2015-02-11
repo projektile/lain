@@ -1,0 +1,24 @@
+#!/bin/bash
+
+iface="$(ip link show | cut -d' ' -f2,9 | grep UP | awk {'print $1'} | tr -d ':')"
+echo $iface $(wicd-cli -i | grep -n 3 | awk {'print i$2, $3, $4, $5, $6, $7'})
+
+rx_old=$(cat /sys/class/net/$iface/statistics/rx_bytes)
+tx_old=$(cat /sys/class/net/$iface/statistics/tx_bytes)
+sleep .1
+rx_now=$(cat /sys/class/net/$iface/statistics/rx_bytes)
+tx_now=$(cat /sys/class/net/$iface/statistics/tx_bytes)
+
+let rx_rate=($rx_now-$rx_old)/1024
+let tx_rate=($tx_now-$tx_old)/1024
+
+print_rx_rate() {
+printf "%-10b" "${rx_rate}K "
+}
+print_tx_rate() {
+printf "%-10b" "${tx_rate}K "
+}
+
+echo $(print_rx_rate)
+echo $(print_tx_rate)
+
